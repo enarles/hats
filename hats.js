@@ -179,7 +179,7 @@ function show(s) {
     s = parse(s);
     let len = s.length;
     console.log(""
-        + (_score(s) / (len**2)) + " "
+        + (100 * _score(s) / (len**2)) + "% "
         + "(" + _score(s) + "/" + (len**2) + "): "
         + _fmt(s));
     return s;
