@@ -406,44 +406,44 @@ function ds(a) {
 
 // == Basic strategies ========================================================
 
-T0 = [-1];
+const T0 = [-1];
 
-W0 = T0;
-W1 = lr([0, 0], W0);
-W2 = lr([0, 0], W1);
-W3 = lr([0, 0], W2);
-W4 = lr([0, 0], W3);
-W5 = lr([0, 0], W4);
-W6 = lr([0, 0], W5);
-W7 = lr([0, 0], W6);
-W8 = lr([0, 0], W7);
-W9 = lr([0, 0], W8);
+const W0 = T0;
+const W1 = lr([0, 0], W0);
+const W2 = lr([0, 0], W1);
+const W3 = lr([0, 0], W2);
+const W4 = lr([0, 0], W3);
+const W5 = lr([0, 0], W4);
+const W6 = lr([0, 0], W5);
+const W7 = lr([0, 0], W6);
+const W8 = lr([0, 0], W7);
+const W9 = lr([0, 0], W8);
 
-B0 = T0;
-B1 = rr([0, 0], B0);
-B2 = rr([0, 0], B1);
-B3 = rr([0, 0], B2);
-B4 = rr([0, 0], B3);
-B5 = rr([0, 0], B4);
-B6 = rr([0, 0], B5);
-B7 = rr([0, 0], B6);
-B8 = rr([0, 0], B7);
-B9 = rr([0, 0], B8);
+const B0 = T0;
+const B1 = rr([0, 0], B0);
+const B2 = rr([0, 0], B1);
+const B3 = rr([0, 0], B2);
+const B4 = rr([0, 0], B3);
+const B5 = rr([0, 0], B4);
+const B6 = rr([0, 0], B5);
+const B7 = rr([0, 0], B6);
+const B8 = rr([0, 0], B7);
+const B9 = rr([0, 0], B8);
 
-C1 = [0, 0];
-C2 = rs(C1);
-C3 = ds(C1);
-C4 = rs(C3);
-C5 = ds(C3);
-C6 = rs(C5);
-C7 = ds(C5);
-C8 = rs(C7);
-C9 = ds(C7);
+const C1 = [0, 0];
+const C2 = rs(C1);
+const C3 = ds(C1);
+const C4 = rs(C3);
+const C5 = ds(C3);
+const C6 = rs(C5);
+const C7 = ds(C5);
+const C8 = rs(C7);
+const C9 = ds(C7);
 
-R0 = T0;
-R1 = dr(C3, R0);
-R2 = dr(C3, R1);
-R3 = dr(C3, R2);
+const R0 = T0;
+const R1 = dr(C3, R0);
+const R2 = dr(C3, R1);
+const R3 = dr(C3, R2);
 
 // == Search for optimal strategies ===========================================
 
