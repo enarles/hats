@@ -73,7 +73,6 @@ function parse(s) {
     if (typeof s === 'string') {
         // special case: tower of height 0 with negative choice
         if (s.slice(0,1) == "-") {
-            console.log("negative");
             s = [parseInt(s)];
         // general case
         } else {
