@@ -68,7 +68,7 @@ function process() {
         console.log('Message reçu depuis le worker ' + e.data);
     }
     document.getElementById("result").innerHTML = "";
-    Worker.postMessage(parse_cmdline(document.getElementById("query").value));
+    worker.postMessage(parse_cmdline(document.getElementById("query").value));
 }
 
 </script>
