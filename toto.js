@@ -181,29 +181,30 @@ function exit(e) {
 
 let buffer = "";
 
-function disp(s) {
-    if (standalone()) { // called from D8
-        console.log(s);
-    } else {            // called from browser
-        buffer += s + "\n";
-        ///console.log(s);///
-        //document.getElementById("result").innerHTML += s + "\n";
-    }
-}
-
 function flush() {
     let buf = buffer;
     buffer = "";
     postMessage(buf);
 }
 
+function disp(s) {
+    if (standalone()) { // called from D8
+        console.log(s);
+    } else {            // called from browser
+        buffer += s + "\n";
+        flush();
+        ///console.log(s);///
+        //document.getElementById("result").innerHTML += s + "\n";
+    }
+}
+
 // -- Keep alive lapse --------------------------------------------------------
 
 function kal() {
     if (standalone()) { // called from D8
-        return 2; //128 * 1024 * 1024;
+        return 128 * 1024 * 1024;
     } else {            // called from browser
-        return 1024; //128 * 1024;
+        return 1128 * 1024;
     }
 }
 
@@ -727,7 +728,7 @@ function _code_level(seed, tower) {
         buf += '    if (--Z == 0) { // Regularly show progress\n';
         buf += '        disp(msg + " > " + H + ": " + _fm() + " " + performance.now());\n';
         buf += '        Z = ' + kal() + '; // Reset counter\n';
-        buf += '        flush(); // Flush the display buffer\n';
+        ///buf += '        flush(); // Flush the display buffer\n';
         buf += '    }\n';
 
         // Tell what this code does
