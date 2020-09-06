@@ -18,17 +18,172 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 // IN THE SOFTWARE.
 
+
 // == HATS CALCULATOR =========================================================
 
 // == Globals =================================================================
 
-// Command line options
-let opt_e = 0;
+// -- Command line options ----------------------------------------------------
+
+let opt_e;
 let opt_command;
-let opt_n = -1;
-let opt_m = -1;
+let opt_n;
+let opt_m;
 let opt_s = "";
-let opt_p = 0;
+let opt_p;
+
+// -- Optimal strategies search -----------------------------------------------
+
+let Z;
+let B;
+let C;
+let msg = "";
+
+// -- Basic strategies --------------------------------------------------------
+let T0;
+
+let W0;
+let W1;
+let W2;
+let W3;
+let W4;
+let W5;
+let W6;
+let W7;
+let W8;
+let W9;
+
+let B0;
+let B1;
+let B2;
+let B3;
+let B4;
+let B5;
+let B6;
+let B7;
+let B8;
+let B9;
+
+let C1;
+let C2;
+let C3;
+let C4;
+let C5;
+let C6;
+let C7;
+let C8;
+let C9;
+
+let R0;
+let R1;
+let R2;
+let R3;
+
+// -- Globals init ------------------------------------------------------------
+
+function globinit() {
+    // Command line options
+    opt_e = 0;
+    opt_command;
+    opt_n = -1;
+    opt_m = -1;
+    opt_s = "";
+    opt_p = 0;
+    // Optimal strategies search
+    Z = kal(); // Show progress each time Z reaches 0
+    B = -1; // Best hit score so far
+    C = 0;  // Number of occurrences
+    msg = "Let's play stacks!";
+
+    // Basic strategies
+    T0 = [-1];
+
+    W0 = T0;
+    W1 = lr([0, 0], W0);
+    W2 = lr([0, 0], W1);
+    W3 = lr([0, 0], W2);
+    W4 = lr([0, 0], W3);
+    W5 = lr([0, 0], W4);
+    W6 = lr([0, 0], W5);
+    W7 = lr([0, 0], W6);
+    W8 = lr([0, 0], W7);
+    W9 = lr([0, 0], W8);
+
+    B0 = T0;
+    B1 = rr([0, 0], B0);
+    B2 = rr([0, 0], B1);
+    B3 = rr([0, 0], B2);
+    B4 = rr([0, 0], B3);
+    B5 = rr([0, 0], B4);
+    B6 = rr([0, 0], B5);
+    B7 = rr([0, 0], B6);
+    B8 = rr([0, 0], B7);
+    B9 = rr([0, 0], B8);
+
+    C1 = [0, 0];
+    C2 = rs(C1);
+    C3 = ds(C1);
+    C4 = rs(C3);
+    C5 = ds(C3);
+    C6 = rs(C5);
+    C7 = ds(C5);
+    C8 = rs(C7);
+    C9 = ds(C7);
+
+    R0 = T0;
+    R1 = dr(C3, R0);
+    R2 = dr(C3, R1);
+    R3 = dr(C3, R2);
+}
+
+// == Externals ===============================================================
+
+// -- Standalone --------------------------------------------------------------
+
+function standalone() {
+    if (typeof window == 'undefined') return true;
+    else return false;
+}
+
+// -- Arguments ---------------------------------------------------------------
+
+let args = [];
+if (standalone()) {
+    // arguments is a special beast that can't be directly copied into an array
+    for (let i = 0; i < arguments.length; ++i) args[i] = arguments[i];
+} else {
+    args = argts; // expected to be provided by browser
+}
+
+// -- Exit --------------------------------------------------------------------
+
+function exit(e) {
+    if (standalone()) { // called from D8
+        quit(e);
+    } else {            // called from browser
+        quit(e);
+    }
+}
+
+// -- Display -----------------------------------------------------------------
+
+function disp(s) {
+    if (standalone()) { // called from D8
+        console.log(s);
+    } else {            // called from browser
+        document.getElementById("result").innerHTML += s + "\n";
+    }
+}
+
+// -- Keep alive lapse --------------------------------------------------------
+
+function kal() {
+    if (standalone()) { // called from D8
+        return 128 * 1024 * 1024;
+    } else {            // called from browser
+        return 1024 * 1024;
+    }
+}
 
 // == Commodity Functions =====================================================
 
@@ -99,22 +254,22 @@ function parse(s) {
                     case "f": s[++t] = 0xf; break;
                     case "-": break;
                     default: {
-                        console.log("" + i + " " + str.slice(i, i+1));
-                        console.log("Parsing Error: 6 (invalid digit)");
-                        quit(6);
+                        disp("" + i + " " + str.slice(i, i+1));
+                        disp("Parsing Error: 6 (invalid digit)");
+                        exit(6);
                     }
                 }
             }
         }
     }
     if (!Array.isArray(s)) {
-        console.log("Parsing error: 1 (not an array)");
-        quit(1);
+        disp("Parsing error: 1 (not an array)");
+        exit(1);
     }
     // at least check that the size of the array is a power of 2
     if (s.length != (1 << log2(s.length))) {
-        console.log("Parsing error: 2 (partial array)");
-        quit(2);
+        disp("Parsing error: 2 (partial array)");
+        exit(2);
     }
     return s;
 }
@@ -177,7 +332,7 @@ function _fmt(s) {
 function show(s) {
     s = parse(s);
     let len = s.length;
-    console.log(""
+    disp(""
         + (100 * _score(s) / (len**2)) + "% "
         + "(" + _score(s) + "/" + (len**2) + "): "
         + _fmt(s));
@@ -223,7 +378,7 @@ function show(s) {
 //    t += ';\n'
 //    t += '\\end{tikzpicture}\n'
 //    t += '\\end{document}\n'
-//    console.log(t);
+//    disp(t);
 //}
 
 // == Operations on strategies ================================================
@@ -265,9 +420,9 @@ function _swap(s, i, j) {
     return s;
 }
 
-// -- Pack a strategy so that s[i] <= i ---------------------------------------
+// -- Crush a strategy so that s[i] <= i --------------------------------------
 
-function pack(s) {
+function crush(s) {
     s = parse(s);
     let c = s.length;
     let n = log2(c);
@@ -275,8 +430,8 @@ function pack(s) {
     s[c-1] = 0;
     for (let t = 0; t < c && t <= n; ++t) {
         if (s[t] < 0 || s[t] >= n) {
-            console.log("Packing error: 10 (choice out of range");
-            quit(10);
+            disp("Crushing error: 10 (choice out of range");
+            exit(10);
         }
         if (s[t] > t) s = _swap(s, t, s[t]);
     }
@@ -403,57 +558,7 @@ function ds(a) {
     return s;
 }
 
-// == Basic strategies ========================================================
-
-const T0 = [-1];
-
-const W0 = T0;
-const W1 = lr([0, 0], W0);
-const W2 = lr([0, 0], W1);
-const W3 = lr([0, 0], W2);
-const W4 = lr([0, 0], W3);
-const W5 = lr([0, 0], W4);
-const W6 = lr([0, 0], W5);
-const W7 = lr([0, 0], W6);
-const W8 = lr([0, 0], W7);
-const W9 = lr([0, 0], W8);
-
-const B0 = T0;
-const B1 = rr([0, 0], B0);
-const B2 = rr([0, 0], B1);
-const B3 = rr([0, 0], B2);
-const B4 = rr([0, 0], B3);
-const B5 = rr([0, 0], B4);
-const B6 = rr([0, 0], B5);
-const B7 = rr([0, 0], B6);
-const B8 = rr([0, 0], B7);
-const B9 = rr([0, 0], B8);
-
-const C1 = [0, 0];
-const C2 = rs(C1);
-const C3 = ds(C1);
-const C4 = rs(C3);
-const C5 = ds(C3);
-const C6 = rs(C5);
-const C7 = ds(C5);
-const C8 = rs(C7);
-const C9 = ds(C7);
-
-const R0 = T0;
-const R1 = dr(C3, R0);
-const R2 = dr(C3, R1);
-const R3 = dr(C3, R2);
-
 // == Search for optimal strategies ===========================================
-
-// -- Globals -----------------------------------------------------------------
-
-// Globals for search
-let B = -1; // Best hit score so far
-let C = 0;  // Number of occurrences
-const ZZ = 128 * 1024 * 1024; // Timing constant
-let Z = ZZ; // Show progress each time Z reaches 0
-let msg = "Let's play stacks!";
 
 // -- Pretty print strategy from expanded format ------------------------------
 
@@ -590,7 +695,7 @@ function _code_level(seed, tower) {
         buf += '        }\n';
         buf += '\n';
         buf += '        msg = "" + H + "[" + ("00" + (++C)).slice(-3) + "]: " + _fm();\n';
-        buf += '        console.log(msg);\n';
+        buf += '        disp(msg);\n';
         buf += '    }\n';
 
     } else if (tower < len - 1) {
@@ -598,8 +703,8 @@ function _code_level(seed, tower) {
         // We are exploring
         buf += '\n';
         buf += '    if (--Z == 0) { // Regularly show progress\n';
-        buf += '        console.log(msg + " > " + H + ": " + _fm() + " " + performance.now());\n';
-        buf += '        Z = ' + ZZ + '; // Reset counter\n';
+        buf += '        disp(msg + " > " + H + ": " + _fm() + " " + performance.now());\n';
+        buf += '        Z = ' + kal() + '; // Reset counter\n';
         buf += '    }\n';
 
         // Tell what this code does
@@ -649,105 +754,145 @@ function _code_expand_seed(seed, tower) {
 
 // == Main ====================================================================
 
-// Parse command line
-while (arguments.length) {
-    switch (arguments[0]) {
-        case "-h": // print manual
-            console.log("hats -n <height> -m <count> -s <seed> // look for optimal strategies");
-            console.log("  <height> specifies the height, defaults to 0");
-            console.log("  <count> specifies max modifications, defaults to 2**height0");
-            console.log("  <seed> specifies a seed strategy, defaults to constant 0");
-            console.log("  e.g.: hats -n 4");
-            console.log("hats -e <expressions> // compute expression");
-            console.log("  <expressions> can combine show, lr, rr, dr, ls, rs, ds");
-            console.log("  e.g.: hats -e 'show(ds(" + '"' + "[00]" + '"' + "))';")
-            break;
-        case "-n": // height
-            arguments = arguments.slice(1);
-            opt_n = parseInt(arguments[0]);
-            break;
-        case "-m": // max modifications
-            arguments = arguments.slice(1);
-            opt_m = parseInt(arguments[0]);
-            break;
-        case "-s": // seed strategy
-            arguments = arguments.slice(1);
-            opt_s = arguments[0];
-            break;
-        case "-e": // execute command
-            ++opt_e;
-            arguments = arguments.slice(1);
-            opt_command = arguments[0];
-            break;
-        case "-p": // measure performance
-            ++opt_p;
-            break;
-        default: // parsing error
-            console.log("Parsing error: 7 (cannot parse command line)");
-            quit(7);
-    }
-    arguments = arguments.slice(1);
-}
-
-// == A/ Evaluate expression ==================================================
-
-if (opt_e) {
-    res = eval(opt_command);
-    if (!Array.isArray(res)) res = parse(res);
-    show(res);
-    quit(0);
-
-// == B/ Produce tikz graphs ==================================================
-
-} else if (0) {
-
-// == C/ Look for optimal strategies ==========================================
-
-} else {
-
-    //console.log("n=" + opt_n + " m=" + opt_m + " s=" + opt_s + " l=" + opt_s.length);
-    if (opt_n == -1 && opt_s == "") {
-        opt_n = 0;
-    }
-    if (opt_s == "") {
-        opt_s = '"';
-        for (let i = 0; i < 2 ** opt_n; ++i) opt_s += '0';
-        opt_s += '"';
-    }
-    let seed = eval(opt_s);
-    if (!Array.isArray(seed)) seed = parse(seed);
-    if (opt_n == -1) opt_n = log2(seed.length);
-    if (log2(seed.length) != opt_n) {
-        console.log("Parameter error: 4 (-n does not match seed strategy height)");
-        quit(4);
-    }
-
-    if (opt_n > 5) {
-        console.log("Parameter error: 7 (cannot handle height > 5)");
-        quit(7);
-    }
-
-    // Check acceptability of seed
-    for (let i = seed.length - 2; i >= 0 ; --i) {
-        if (seed[i] < 0 || seed[i] >= opt_n || seed[i] > i || seed[seed.length - 1] != 0) {
-            console.log("Parameter error: 8 (strategy out of domain, pack() first)");
-            quit(8);
+function cliparse(args) {
+    // Initialize globals
+    globinit();
+    // Parse command line
+    while (args.length) {
+        switch (args[0]) {
+            case "-h": // print manual
+                disp("hats -n <height> -m <count> -s <seed> // look for optimal strategies");
+                disp("  <height> specifies the height, defaults to 0");
+                disp("  <count> specifies max modifications, defaults to 2**height0");
+                disp("  <seed> specifies a seed strategy, defaults to constant 0");
+                disp("  e.g.: hats -n 4");
+                disp("hats -e <expressions> // compute expression");
+                disp("  <expressions> can combine show, lr, rr, dr, ls, rs, ds");
+                disp("  e.g.: hats -e 'show(ds(" + '"' + "[00]" + '"' + "))';")
+                break;
+            case "-n": // height
+                args = args.slice(1);
+                opt_n = parseInt(args[0]);
+                break;
+            case "-m": // max modifications
+                args = args.slice(1);
+                opt_m = parseInt(args[0]);
+                break;
+            case "-s": // seed strategy
+                args = args.slice(1);
+                opt_s = args[0];
+                break;
+            case "-e": // execute command
+                ++opt_e;
+                args = args.slice(1);
+                opt_command = args[0];
+                break;
+            case "-p": // measure performance
+                ++opt_p;
+                break;
+            default: // parsing error
+                disp("Parsing error: 7 (cannot parse command line)");
+                exit(7);
         }
+        args = args.slice(1);
     }
 
-    if (opt_m == -1) opt_m = seed.length - 2;
+    // Deal with parameters for strategy search
+    if (opt_n != -1 || opt_s != "") {
+        //disp("n=" + opt_n + " m=" + opt_m + " s=" + opt_s + " l=" + opt_s.length);
+        if (opt_n == -1 && opt_s == "") {
+            opt_n = 0;
+        }
+        if (opt_s == "") {
+            opt_s = '"';
+            for (let i = 0; i < 2 ** opt_n; ++i) opt_s += '0';
+            opt_s += '"';
+        }
+        opt_s = eval(opt_s);
+        if (!Array.isArray(opt_s)) opt_s = parse(opt_s);
+        if (opt_n == -1) opt_n = log2(opt_s.length);
+        if (log2(opt_s.length) != opt_n) {
+            disp("Parameter error: 4 (-n does not match seed strategy height)");
+            exit(4);
+        }
 
-    ///console.log(_code_level(seed, 1));
-    ///quit(0);
+        if (opt_n > 5) {
+            disp("Parameter error: 7 (cannot handle height > 5)");
+            exit(7);
+        }
 
-    // Create display functions for expanded format
-    eval(_code_fm(seed));
-    // Create expanded format for seed
-    for (let i = seed.length - 1; i >= 0; --i) eval(_code_expand_seed(seed, i));
-    // Create hardcoded explore functions for expanded format
-    for (let i = seed.length - 1; i > 0; --i) eval(_code_level(seed, i));
-    // Launch search
-    x1(_score(seed));
+        // Check acceptability of seed
+        for (let i = opt_s.length - 2; i >= 0 ; --i) {
+            if (opt_s[i] < 0 || opt_s[i] >= opt_n || opt_s[i] > i || opt_s[opt_s.length - 1] != 0) {
+                disp("Parameter error: 8 (strategy out of domain, crush() first)");
+                exit(8);
+            }
+        }
+
+        if (opt_m == -1) opt_m = opt_s.length - 2;
+    }
 }
 
-quit(0);
+function hats(args) {
+    // Parse command line
+    cliparse(args);
+
+    // == A/ Evaluate expression ==================================================
+
+    if (opt_e) {
+        res = eval(opt_command);
+        if (!Array.isArray(res)) res = parse(res);
+        show(res);
+
+    // == B/ Look for optimal strategies ==========================================
+
+    } else if (opt_n != -1) {
+        // Create display functions for expanded format
+        eval(_code_fm(seed));
+        // Create expanded format for seed
+        for (let i = seed.length - 1; i >= 0; --i) eval(_code_expand_seed(seed, i));
+        // Create hardcoded explore functions for expanded format
+        for (let i = seed.length - 1; i > 0; --i) eval(_code_level(seed, i));
+        // Launch search
+        x1(_score(seed));
+    }
+}
+
+// == Fast track when called from D8 ==========================================
+
+// The reason this code is not encapsulated within a function
+// is because this give a huge performance boost.
+// This is due to use of eval to define functions.
+// This code does not compile with JavaScript strict.
+if (standalone()) {
+    // Parse command line
+    cliparse(arguments);
+
+    // == A/ Evaluate expression ==============================================
+
+    if (opt_e) {
+        res = eval(opt_command);
+        if (!Array.isArray(res)) res = parse(res);
+        show(res);
+
+    // == B/ Look for optimal strategies ======================================
+
+    } else if (opt_n != -1) {
+
+        // Create display functions for expanded format
+        eval(_code_fm(opt_s));
+        // Create expanded format for seed
+        for (let i = opt_s.length - 1; i >= 0; --i) eval(_code_expand_seed(opt_s, i));
+        // Create hardcoded explore functions for expanded format
+        for (let i = opt_s.length - 1; i > 0; --i) eval(_code_level(opt_s, i));
+        // Launch search
+        x1(_score(opt_s));
+
+    } else if (0) {
+
+    // == C/ Produce tikz graphs ==============================================
+    
+    }
+}
+
+// == The end =================================================================
