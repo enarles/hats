@@ -21,12 +21,6 @@
 
 // == HATS CALCULATOR =========================================================
 
-onmessage = function(e) {
-    ///console.log('HERE');
-    ///console.log(e.data);
-    hats(e.data);
-}
-
 // == Globals =================================================================
 
 // -- Command line options ----------------------------------------------------
@@ -157,16 +151,6 @@ function standalone() {
 ///    else return false;
 }
 
-// -- Arguments ---------------------------------------------------------------
-
-///let args = [];
-///if (standalone()) {
-///    // arguments is a special beast that can't be directly copied into an array
-///    for (let i = 0; i < arguments.length; ++i) args[i] = arguments[i];
-///} else {
-///    args = argts; // expected to be provided by browser
-///}
-
 // -- Exit --------------------------------------------------------------------
 
 function exit(e) {
@@ -193,8 +177,6 @@ function disp(s) {
     } else {            // called from browser
         buffer += s + "\n";
         flush();
-        ///console.log(s);///
-        //document.getElementById("result").innerHTML += s + "\n";
     }
 }
 
@@ -731,7 +713,6 @@ function _code_level(seed, tower) {
         else
         buf += '        disp(msg + " > " + H + ": " + _fm());\n';
         buf += '        Z = ' + kal() + '; // Reset counter\n';
-        ///buf += '        flush(); // Flush the display buffer\n';
         buf += '    }\n';
 
         // Tell what this code does
@@ -860,6 +841,11 @@ function cliparse(args) {
     }
 }
 
+// == Slow track when called from web worker ==================================
+
+onmessage = function(e) {
+    hats(e.data);
+}
 function hats(args) {
     // Parse command line
     cliparse(args);
@@ -925,6 +911,10 @@ if (standalone()) {
     // == C/ Produce tikz graphs ==============================================
     
     }
+
+    // == Conclude ============================================================
+
+    disp("Done! (" + performance.now() + ")");
 }
 
 // == The end =================================================================
