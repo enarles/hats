@@ -709,7 +709,7 @@ function _code_level(seed, tower) {
         buf += '\n';
         buf += '    if (--Z == 0) { // Regularly show progress\n';
         if (opt_p)
-        buf += '        disp(msg + " > " + H + ": " + _fm() + " " + performance.now());\n';
+        buf += '        disp(msg + " > " + H + ": " + _fm() + " (" + Math.trunc(performance.now()) + " ms)");\n';
         else
         buf += '        disp(msg + " > " + H + ": " + _fm());\n';
         buf += '        Z = ' + kal() + '; // Reset counter\n';
@@ -872,7 +872,7 @@ function hats(args) {
 
     // == Conclude ============================================================
 
-    disp("Done! (" + performance.now() + ")");
+    disp("Done! (" + Math.trunc(performance.now()) + " ms)");
     flush(); // Flush the display buffer
 }
 
@@ -914,7 +914,7 @@ if (standalone()) {
 
     // == Conclude ============================================================
 
-    disp("Done! (" + performance.now() + ")");
+    disp("Done! (" + Math.trunc(performance.now()) + " ms)");
 }
 
 // == The end =================================================================
