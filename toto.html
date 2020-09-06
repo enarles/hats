@@ -65,6 +65,7 @@ function parse_cmdline(cmdline) {
 function process() {
     let worker = new Worker('./toto.js');
     worker.onmessage = function(e) {
+        document.getElementById("result").innerHTML += e.data;
         console.log('Message reçu depuis le worker ' + e.data);
     }
     document.getElementById("result").innerHTML = "";

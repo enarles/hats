@@ -22,10 +22,9 @@
 // == HATS CALCULATOR =========================================================
 
 onmessage = function(e) {
-    console.log('HERE');
-    console.log(e.data);
+    ///console.log('HERE');
+    ///console.log(e.data);
     hats(e.data);
-    //postMessage(result);
 }
 
 // == Globals =================================================================
@@ -36,7 +35,7 @@ let opt_e;
 let opt_command;
 let opt_n;
 let opt_m;
-let opt_s = "";
+let opt_s;
 let opt_p;
 
 // -- Optimal strategies search -----------------------------------------------
@@ -44,7 +43,7 @@ let opt_p;
 let Z;
 let B;
 let C;
-let msg = "";
+let msg;
 
 // -- Basic strategies --------------------------------------------------------
 let T0;
@@ -180,11 +179,17 @@ function exit(e) {
 
 // -- Display -----------------------------------------------------------------
 
+
+// -- Command line options ----------------------------------------------------
+
+let buffer = "";
+
 function disp(s) {
     if (standalone()) { // called from D8
         console.log(s);
     } else {            // called from browser
-        console.log(s);///
+        buffer += s + "\n";
+        ///console.log(s);///
         //document.getElementById("result").innerHTML += s + "\n";
     }
 }
@@ -851,14 +856,14 @@ function hats(args) {
     // Parse command line
     cliparse(args);
 
-    // == A/ Evaluate expression ==================================================
+    // == A/ Evaluate expression ==============================================
 
     if (opt_e) {
         res = eval(opt_command);
         if (!Array.isArray(res)) res = parse(res);
         show(res);
 
-    // == B/ Look for optimal strategies ==========================================
+    // == B/ Look for optimal strategies ======================================
 
     } else if (opt_n != -1) {
         // Create display functions for expanded format
@@ -870,6 +875,12 @@ function hats(args) {
         // Launch search
         x1(_score(opt_s));
     }
+
+    // == Send result back to caller ==========================================
+
+    let buf = buffer;
+    buffer = "";
+    postMessage(buf);
 }
 
 // == Fast track when called from D8 ==========================================
