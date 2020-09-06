@@ -204,7 +204,7 @@ function kal() {
     if (standalone()) { // called from D8
         return 128 * 1024 * 1024;
     } else {            // called from browser
-        return 1128 * 1024;
+        return 256 * 1024;
     }
 }
 
@@ -726,7 +726,10 @@ function _code_level(seed, tower) {
         // We are exploring
         buf += '\n';
         buf += '    if (--Z == 0) { // Regularly show progress\n';
+        if (opt_p)
         buf += '        disp(msg + " > " + H + ": " + _fm() + " " + performance.now());\n';
+        else
+        buf += '        disp(msg + " > " + H + ": " + _fm();\n';
         buf += '        Z = ' + kal() + '; // Reset counter\n';
         ///buf += '        flush(); // Flush the display buffer\n';
         buf += '    }\n';
