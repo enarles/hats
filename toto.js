@@ -19,6 +19,15 @@
 // IN THE SOFTWARE.
 
 
+
+onmessage = function(e) {
+    console.log('HERE');
+    console.log(e.data);
+    hats(e.data);
+    //postMessage(result);
+}
+
+
 // == HATS CALCULATOR =========================================================
 
 // == Globals =================================================================
@@ -141,19 +150,25 @@ function globinit() {
 // -- Standalone --------------------------------------------------------------
 
 function standalone() {
-    if (typeof window == 'undefined') return true;
-    else return false;
+    if (typeof WorkerGlobalScope !== 'undefined'
+    && self instanceof WorkerGlobalScope) {
+        return false;
+    } else {
+        return true;
+    }
+///    if (typeof window == 'undefined') return true;
+///    else return false;
 }
 
 // -- Arguments ---------------------------------------------------------------
 
-let args = [];
-if (standalone()) {
-    // arguments is a special beast that can't be directly copied into an array
-    for (let i = 0; i < arguments.length; ++i) args[i] = arguments[i];
-} else {
-    args = argts; // expected to be provided by browser
-}
+///let args = [];
+///if (standalone()) {
+///    // arguments is a special beast that can't be directly copied into an array
+///    for (let i = 0; i < arguments.length; ++i) args[i] = arguments[i];
+///} else {
+///    args = argts; // expected to be provided by browser
+///}
 
 // -- Exit --------------------------------------------------------------------
 
@@ -180,7 +195,7 @@ function disp(s) {
 
 function kal() {
     if (standalone()) { // called from D8
-        return 128 * 1024 * 1024;
+        return 2; //128 * 1024 * 1024;
     } else {            // called from browser
         return 128 * 1024;
     }
@@ -858,15 +873,6 @@ function hats(args) {
         x1(_score(opt_s));
     }
 }
-
-onmessage = function(e) {
-    console.log('HERE');
-    console.log(e.data);
-    hats(e.data);
-    //postMessage(result);
-}
-
-
 
 // == Fast track when called from D8 ==========================================
 
