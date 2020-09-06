@@ -816,8 +816,8 @@ function cliparse(args) {
             exit(4);
         }
 
-        if (opt_n > 5) {
-            disp("Parameter error: 7 (cannot handle height > 5)");
+        if (opt_n > 4) {
+            disp("Parameter error: 7 (cannot handle height > 4)");
             exit(7);
         }
 
@@ -848,13 +848,13 @@ function hats(args) {
 
     } else if (opt_n != -1) {
         // Create display functions for expanded format
-        eval(_code_fm(seed));
+        eval(_code_fm(opt_s));
         // Create expanded format for seed
-        for (let i = seed.length - 1; i >= 0; --i) eval(_code_expand_seed(seed, i));
+        for (let i = opt_s.length - 1; i >= 0; --i) eval(_code_expand_seed(opt_s, i));
         // Create hardcoded explore functions for expanded format
-        for (let i = seed.length - 1; i > 0; --i) eval(_code_level(seed, i));
+        for (let i = opt_s.length - 1; i > 0; --i) eval(_code_level(opt_s, i));
         // Launch search
-        x1(_score(seed));
+        x1(_score(opt_s));
     }
 }
 
