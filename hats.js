@@ -181,7 +181,7 @@ function kal() {
     if (standalone()) { // called from D8
         return 128 * 1024 * 1024;
     } else {            // called from browser
-        return 1024 * 1024;
+        return 128 * 1024;
     }
 }
 
@@ -816,8 +816,8 @@ function cliparse(args) {
             exit(4);
         }
 
-        if (opt_n > 4) {
-            disp("Parameter error: 7 (cannot handle height > 4)");
+        if (opt_n > 3) {
+            disp("Parameter error: 7 (browser version cannot handle height > 3)");
             exit(7);
         }
 
