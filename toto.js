@@ -884,8 +884,9 @@ function hats(args) {
         x1(_score(opt_s));
     }
 
-    // == Send result back to caller ==========================================
+    // == Conclude ============================================================
 
+    disp("Done! (" + performance.now() + ")");
     flush(); // Flush the display buffer
 }
 
