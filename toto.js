@@ -179,9 +179,6 @@ function exit(e) {
 
 // -- Display -----------------------------------------------------------------
 
-
-// -- Command line options ----------------------------------------------------
-
 let buffer = "";
 
 function disp(s) {
@@ -194,13 +191,19 @@ function disp(s) {
     }
 }
 
+function flush() {
+    let buf = buffer;
+    buffer = "";
+    postMessage(buf);
+}
+
 // -- Keep alive lapse --------------------------------------------------------
 
 function kal() {
     if (standalone()) { // called from D8
         return 2; //128 * 1024 * 1024;
     } else {            // called from browser
-        return 128 * 1024;
+        return 1024; //128 * 1024;
     }
 }
 
@@ -724,6 +727,7 @@ function _code_level(seed, tower) {
         buf += '    if (--Z == 0) { // Regularly show progress\n';
         buf += '        disp(msg + " > " + H + ": " + _fm() + " " + performance.now());\n';
         buf += '        Z = ' + kal() + '; // Reset counter\n';
+        buf += '        flush(); // Flush the display buffer\n';
         buf += '    }\n';
 
         // Tell what this code does
@@ -878,9 +882,7 @@ function hats(args) {
 
     // == Send result back to caller ==========================================
 
-    let buf = buffer;
-    buffer = "";
-    postMessage(buf);
+    flush(); // Flush the display buffer
 }
 
 // == Fast track when called from D8 ==========================================
