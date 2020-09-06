@@ -729,7 +729,7 @@ function _code_level(seed, tower) {
         if (opt_p)
         buf += '        disp(msg + " > " + H + ": " + _fm() + " " + performance.now());\n';
         else
-        buf += '        disp(msg + " > " + H + ": " + _fm();\n';
+        buf += '        disp(msg + " > " + H + ": " + _fm());\n';
         buf += '        Z = ' + kal() + '; // Reset counter\n';
         ///buf += '        flush(); // Flush the display buffer\n';
         buf += '    }\n';
