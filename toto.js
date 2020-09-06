@@ -19,6 +19,7 @@
 // IN THE SOFTWARE.
 
 
+// == HATS CALCULATOR =========================================================
 
 onmessage = function(e) {
     console.log('HERE');
@@ -26,9 +27,6 @@ onmessage = function(e) {
     hats(e.data);
     //postMessage(result);
 }
-
-
-// == HATS CALCULATOR =========================================================
 
 // == Globals =================================================================
 
@@ -832,8 +830,8 @@ function cliparse(args) {
             exit(4);
         }
 
-        if (opt_n > 3) {
-            disp("Parameter error: 7 (browser version cannot handle height > 3)");
+        if (opt_n > 5) {
+            disp("Parameter error: 7 (cannot handle height > 5)");
             exit(7);
         }
 
