@@ -30,42 +30,46 @@ Query: <code><span style='color: green'>$ </span>d8 hats.js -- </code>
 <br/>
 Result: <pre name="result" id="result"></pre>
 
-<script src="hats.js"></script>
-
 <script>
-    // From https://stackoverflow.com/questions/39303787/parse-string-into-command-and-args-in-javascript
-    function parse_cmdline(cmdline) {
-        var re_next_arg = /^\s*((?:(?:"(?:\\.|[^"])*")|(?:'[^']*')|\\.|\S)+)\s*(.*)$/;
-        var next_arg = ['', '', cmdline];
-        var args = [];
-        while (next_arg = re_next_arg.exec(next_arg[2])) {
-            var quoted_arg = next_arg[1];
-            var unquoted_arg = "";
-            while (quoted_arg.length > 0) {
-                if (/^"/.test(quoted_arg)) {
-                    var quoted_part = /^"((?:\\.|[^"])*)"(.*)$/.exec(quoted_arg);
-                    unquoted_arg += quoted_part[1].replace(/\\(.)/g, "$1");
-                    quoted_arg = quoted_part[2];
-                } else if (/^'/.test(quoted_arg)) {
-                    var quoted_part = /^'([^']*)'(.*)$/.exec(quoted_arg);
-                    unquoted_arg += quoted_part[1];
-                    quoted_arg = quoted_part[2];
-                } else if (/^\\/.test(quoted_arg)) {
-                    unquoted_arg += quoted_arg[1];
-                    quoted_arg = quoted_arg.substring(2);
-                } else {
-                    unquoted_arg += quoted_arg[0];
-                    quoted_arg = quoted_arg.substring(1);
-                }
-            }
-            args[args.length] = unquoted_arg;
-        }
-        return args;
-    }
 
-    function process() {
-        document.getElementById("result").innerHTML = "";
-        hats(parse_cmdline(document.getElementById("query").value));
+// From https://stackoverflow.com/questions/39303787/parse-string-into-command-and-args-in-javascript
+function parse_cmdline(cmdline) {
+    var re_next_arg = /^\s*((?:(?:"(?:\\.|[^"])*")|(?:'[^']*')|\\.|\S)+)\s*(.*)$/;
+    var next_arg = ['', '', cmdline];
+    var args = [];
+    while (next_arg = re_next_arg.exec(next_arg[2])) {
+        var quoted_arg = next_arg[1];
+        var unquoted_arg = "";
+        while (quoted_arg.length > 0) {
+            if (/^"/.test(quoted_arg)) {
+                var quoted_part = /^"((?:\\.|[^"])*)"(.*)$/.exec(quoted_arg);
+                unquoted_arg += quoted_part[1].replace(/\\(.)/g, "$1");
+                quoted_arg = quoted_part[2];
+            } else if (/^'/.test(quoted_arg)) {
+                var quoted_part = /^'([^']*)'(.*)$/.exec(quoted_arg);
+                unquoted_arg += quoted_part[1];
+                quoted_arg = quoted_part[2];
+            } else if (/^\\/.test(quoted_arg)) {
+                unquoted_arg += quoted_arg[1];
+                quoted_arg = quoted_arg.substring(2);
+            } else {
+                unquoted_arg += quoted_arg[0];
+                quoted_arg = quoted_arg.substring(1);
+            }
+        }
+        args[args.length] = unquoted_arg;
     }
+    return args;
+}
+
+function process() {
+    let worker = new Worker('./hats.js');
+    worker.onmessage = function(e) {
+        document.getElementById("result").innerHTML += e.data;
+    }
+    document.getElementById("result").innerHTML = "";
+    worker.postMessage(parse_cmdline(document.getElementById("query").value));
+}
+
 </script>
 </div>

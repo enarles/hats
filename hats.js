@@ -29,7 +29,7 @@ let opt_e;
 let opt_command;
 let opt_n;
 let opt_m;
-let opt_s = "";
+let opt_s;
 let opt_p;
 
 // -- Optimal strategies search -----------------------------------------------
@@ -37,7 +37,7 @@ let opt_p;
 let Z;
 let B;
 let C;
-let msg = "";
+let msg;
 
 // -- Basic strategies --------------------------------------------------------
 let T0;
@@ -141,18 +141,14 @@ function globinit() {
 // -- Standalone --------------------------------------------------------------
 
 function standalone() {
-    if (typeof window == 'undefined') return true;
-    else return false;
-}
-
-// -- Arguments ---------------------------------------------------------------
-
-let args = [];
-if (standalone()) {
-    // arguments is a special beast that can't be directly copied into an array
-    for (let i = 0; i < arguments.length; ++i) args[i] = arguments[i];
-} else {
-    args = argts; // expected to be provided by browser
+    if (typeof WorkerGlobalScope !== 'undefined'
+    && self instanceof WorkerGlobalScope) {
+        return false;
+    } else {
+        return true;
+    }
+///    if (typeof window == 'undefined') return true;
+///    else return false;
 }
 
 // -- Exit --------------------------------------------------------------------
@@ -167,11 +163,20 @@ function exit(e) {
 
 // -- Display -----------------------------------------------------------------
 
+let buffer = "";
+
+function flush() {
+    let buf = buffer;
+    buffer = "";
+    postMessage(buf);
+}
+
 function disp(s) {
     if (standalone()) { // called from D8
         console.log(s);
     } else {            // called from browser
-        document.getElementById("result").innerHTML += s + "\n";
+        buffer += s + "\n";
+        flush();
     }
 }
 
@@ -181,7 +186,7 @@ function kal() {
     if (standalone()) { // called from D8
         return 128 * 1024 * 1024;
     } else {            // called from browser
-        return 128 * 1024;
+        return 256 * 1024;
     }
 }
 
@@ -703,7 +708,10 @@ function _code_level(seed, tower) {
         // We are exploring
         buf += '\n';
         buf += '    if (--Z == 0) { // Regularly show progress\n';
+        if (opt_p)
         buf += '        disp(msg + " > " + H + ": " + _fm() + " " + performance.now());\n';
+        else
+        buf += '        disp(msg + " > " + H + ": " + _fm());\n';
         buf += '        Z = ' + kal() + '; // Reset counter\n';
         buf += '    }\n';
 
@@ -816,8 +824,8 @@ function cliparse(args) {
             exit(4);
         }
 
-        if (opt_n > 3) {
-            disp("Parameter error: 7 (browser version cannot handle height > 3)");
+        if (opt_n > 5) {
+            disp("Parameter error: 7 (cannot handle height > 5)");
             exit(7);
         }
 
@@ -833,18 +841,23 @@ function cliparse(args) {
     }
 }
 
+// == Slow track when called from web worker ==================================
+
+onmessage = function(e) {
+    hats(e.data);
+}
 function hats(args) {
     // Parse command line
     cliparse(args);
 
-    // == A/ Evaluate expression ==================================================
+    // == A/ Evaluate expression ==============================================
 
     if (opt_e) {
         res = eval(opt_command);
         if (!Array.isArray(res)) res = parse(res);
         show(res);
 
-    // == B/ Look for optimal strategies ==========================================
+    // == B/ Look for optimal strategies ======================================
 
     } else if (opt_n != -1) {
         // Create display functions for expanded format
@@ -856,6 +869,11 @@ function hats(args) {
         // Launch search
         x1(_score(opt_s));
     }
+
+    // == Conclude ============================================================
+
+    disp("Done! (" + performance.now() + ")");
+    flush(); // Flush the display buffer
 }
 
 // == Fast track when called from D8 ==========================================
@@ -893,6 +911,10 @@ if (standalone()) {
     // == C/ Produce tikz graphs ==============================================
     
     }
+
+    // == Conclude ============================================================
+
+    disp("Done! (" + performance.now() + ")");
 }
 
 // == The end =================================================================
