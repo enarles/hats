@@ -63,7 +63,7 @@ function parse_cmdline(cmdline) {
 }
 
 function process() {
-    let worker = new Worker('./hats.js?answer=42&question=ultimate');
+    let worker = new Worker('./hats.js?query=-n%204');
     worker.onmessage = function(e) {
         document.getElementById("result").innerHTML += e.data;
     }
