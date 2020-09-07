@@ -63,12 +63,13 @@ function parse_cmdline(cmdline) {
 }
 
 function process() {
-    let worker = new Worker('./hats.js?query=-n%204');
+    let query = document.getElementById("query").value;
+    let worker = new Worker('./hats.js?query=' + encodeURI(query));
     worker.onmessage = function(e) {
         document.getElementById("result").innerHTML += e.data;
     }
     document.getElementById("result").innerHTML = "";
-    worker.postMessage(parse_cmdline(document.getElementById("query").value));
+    ///worker.postMessage(parse_cmdline(document.getElementById("query").value));
 }
 
 </script>

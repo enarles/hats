@@ -19,12 +19,6 @@
 // IN THE SOFTWARE.
 
 
-var parameters = {}
-location.search.slice(1).split("&").forEach( function(key_value) { var kv = key_value.split("="); parameters[kv[0]] = kv[1]; })
-console.log(parameters);
-var query = decodeURI(parameters['query']);
-console.log("query is: " + query);
-
 // == HATS CALCULATOR =========================================================
 
 // == Globals =================================================================
@@ -884,13 +878,50 @@ function hats(args) {
 
 // == Fast track when called from D8 ==========================================
 
+// From https://stackoverflow.com/questions/39303787/parse-string-into-command-and-args-in-javascript
+function parse_cmdline(cmdline) {
+    var re_next_arg = /^\s*((?:(?:"(?:\\.|[^"])*")|(?:'[^']*')|\\.|\S)+)\s*(.*)$/;
+    var next_arg = ['', '', cmdline];
+    var args = [];
+    while (next_arg = re_next_arg.exec(next_arg[2])) {
+        var quoted_arg = next_arg[1];
+        var unquoted_arg = "";
+        while (quoted_arg.length > 0) {
+            if (/^"/.test(quoted_arg)) {
+                var quoted_part = /^"((?:\\.|[^"])*)"(.*)$/.exec(quoted_arg);
+                unquoted_arg += quoted_part[1].replace(/\\(.)/g, "$1");
+                quoted_arg = quoted_part[2];
+            } else if (/^'/.test(quoted_arg)) {
+                var quoted_part = /^'([^']*)'(.*)$/.exec(quoted_arg);
+                unquoted_arg += quoted_part[1];
+                quoted_arg = quoted_part[2];
+            } else if (/^\\/.test(quoted_arg)) {
+                unquoted_arg += quoted_arg[1];
+                quoted_arg = quoted_arg.substring(2);
+            } else {
+                unquoted_arg += quoted_arg[0];
+                quoted_arg = quoted_arg.substring(1);
+            }
+        }
+        args[args.length] = unquoted_arg;
+    }
+    return args;
+}
+
+let parameters = {}
+location.search.slice(1).split("&").forEach( function(key_value) { var kv = key_value.split("="); parameters[kv[0]] = kv[1]; })
+console.log(parameters);
+let query = decodeURI(parameters['query']);
+console.log("query is: " + query);
+
 // The reason this code is not encapsulated within a function
 // is because this give a huge performance boost.
 // This is due to use of eval to define functions.
 // This code does not compile with JavaScript strict.
-if (standalone()) {
+if (1 || standalone()) {///
     // Parse command line
-    cliparse(arguments);
+    ///cliparse(arguments);
+    cliparse(parse_cmdline(query));///
 
     // == A/ Evaluate expression ==============================================
 
